@@ -4,6 +4,7 @@ import "./globals.css";
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 import QueryProvider from "@/components/QueryProvider";
+import ThemeProvider from "@/components/theme-provider";
 export const metadata: Metadata = {
   title: "incognitalk.",
   description: "incognitalk.",
@@ -19,7 +20,11 @@ export default function RootLayout({
       <body
         className={`${outfit.variable} antialiased font-outfit text-sm sm:text-base`}
       >
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <ThemeProvider attribute="class" defaultTheme="light">
+            {children}
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

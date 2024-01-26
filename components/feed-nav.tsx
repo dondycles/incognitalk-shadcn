@@ -62,7 +62,7 @@ export default function FeedNav({
         </Dialog>
 
         {isFetching ? (
-          <Skeleton className="h-[40px] w-32 py-2 px-4"></Skeleton>
+          <Skeleton className="h-[40px] w-[40px] py-2 px-4"></Skeleton>
         ) : (
           <UserNavButton userData={userData} />
         )}

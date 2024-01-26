@@ -28,7 +28,9 @@ export default function Feed() {
               </div>
             </div>
           </CardHeader>
-          <CardContent>{optimisticPost.content}</CardContent>
+          <CardContent className="whitespace-pre">
+            {optimisticPost.content}
+          </CardContent>
         </Card>
       )}
       {publicPosts?.success?.map((post) => {
@@ -38,7 +40,7 @@ export default function Feed() {
               <div className="flex flex-row items-center gap-4">
                 <UserCircle className="w-10 h-10" />{" "}
                 <div className="flex flex-col">
-                  <p>{post.users.username}</p>
+                  <p>{post.users?.username}</p>
                   <p className="text-muted-foreground text-xs">
                     {new Date(post.created_at).toLocaleDateString()}
                   </p>

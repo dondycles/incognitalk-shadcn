@@ -9,9 +9,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User } from "lucide-react";
+import {
+  AArrowDown,
+  ArrowBigDown,
+  ArrowDown,
+  Droplet,
+  LogOut,
+  Settings,
+  SettingsIcon,
+  User,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import ThemeToggle from "./theme-toggle";
 
 export default function UserNavButton({ userData }: { userData: any }) {
   const [isLogginOut, setIsLogginOut] = useState(false);
@@ -25,8 +35,8 @@ export default function UserNavButton({ userData }: { userData: any }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <Button>
-          {isLogginOut ? "Logging out..." : userData?.success?.dbData.username}
+        <Button size={"icon"}>
+          <SettingsIcon className="w-4 h-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -40,6 +50,11 @@ export default function UserNavButton({ userData }: { userData: any }) {
           <LogOut className="w-4 h-4 mr-2" />
           Logout
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <div className="flex gap-2 p-2">
+          <ThemeToggle />
+          <p className="text-sm">Dark Mode</p>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
