@@ -3,7 +3,7 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
-
+import QueryProvider from "@/components/QueryProvider";
 export const metadata: Metadata = {
   title: "incognitalk.",
   description: "incognitalk.",
@@ -19,7 +19,7 @@ export default function RootLayout({
       <body
         className={`${outfit.variable} antialiased font-outfit text-sm sm:text-base`}
       >
-        {children}
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );

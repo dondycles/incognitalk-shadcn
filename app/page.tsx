@@ -3,7 +3,7 @@ import Link from "next/link";
 import { VenetianMask } from "lucide-react";
 export default function Home() {
   return (
-    <main className="w-full p-4 sm:px-8 md:px-16 lg:px-32 xl:px-64 2xl:px-96 h-[100dvh] flex items-center justify-center gap-4 flex-col">
+    <main className="w-full system-padding h-[100dvh] flex items-center justify-center gap-4 flex-col">
       <div className="space-y-4">
         <div>
           <h1 className="text-6xl font-bold">incognitalk.</h1>

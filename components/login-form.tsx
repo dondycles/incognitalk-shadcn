@@ -25,6 +25,7 @@ import {
 } from "./ui/card";
 import Link from "next/link";
 import { login } from "@/actions/log-in";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   username: z.string().min(1, {
@@ -36,6 +37,7 @@ const formSchema = z.object({
 });
 
 export function LogInForm() {
+  const route = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,11 +53,11 @@ export function LogInForm() {
 
     if (error) return;
 
-    form.reset();
+    route.push("/feed");
   }
 
   return (
-    <Card className="w-full mb-auto">
+    <Card className="w-full mb-auto z-20">
       <CardHeader>
         <CardTitle>Welcome back!</CardTitle>
         <CardDescription>

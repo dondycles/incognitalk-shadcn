@@ -25,6 +25,7 @@ import {
 } from "./ui/card";
 import Link from "next/link";
 import { signup } from "@/actions/sign-up";
+import { useRouter } from "next/navigation";
 
 const formSchema = z
   .object({
@@ -44,6 +45,7 @@ const formSchema = z
   });
 
 export function SignUpForm() {
+  const route = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -60,11 +62,11 @@ export function SignUpForm() {
 
     if (error) return;
 
-    form.reset();
+    route.push("/feed");
   }
 
   return (
-    <Card className="w-full mb-auto">
+    <Card className="w-full mb-auto z-20">
       <CardHeader>
         <CardTitle>Let's start revealing.</CardTitle>
         <CardDescription>

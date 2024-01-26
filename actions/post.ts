@@ -19,11 +19,10 @@ export const post = async (values?: any) => {
   const { data, error } = await supabase
     .from("posts")
     .insert({
-      content: "baliw",
-      user: "tanga",
+      content: values.content,
     })
     .select();
 
-  console.log(data, error);
-  return;
+  if (error) return { error: error };
+  return { success: data };
 };
