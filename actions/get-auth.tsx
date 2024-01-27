@@ -1,14 +1,7 @@
 "use server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
-export const signup = async (values: {
-  cpassword: string;
-  password: string;
-  username: string;
-}) => {
-  if (values.cpassword != values.password)
-    return { error: "Password did not match!" };
-
+export const getauth = async () => {
   const cookieStore = cookies();
 
   const supabase = createServerClient(
@@ -29,16 +22,9 @@ export const signup = async (values: {
     }
   );
 
-  const { error: authError, data: authData } = await supabase.auth.signUp({
-    email: values.username + "@incognitalk.com",
-    password: values.password,
-  });
-  if (authError) return { error: authError.message };
+  const { data, error } = await supabase.auth.getUser();
 
-  const { error: dbError } = await supabase.from("users").insert({
-    username: values.username,
-  });
-  if (dbError) return { error: dbError.message };
+  if (error) return { error: error };
 
-  return { success: authData };
+  return { success: data };
 };

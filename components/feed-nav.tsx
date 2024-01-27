@@ -19,20 +19,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "./ui/input";
 import { AddPostForm } from "./add-post-form";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getuser } from "@/actions/get-user";
 
-export default function FeedNav({
-  isFetching,
-  userData,
-}: {
-  isFetching: boolean;
-  userData: any;
-}) {
+export default function FeedNav() {
   const [openDialog, setOpenDialog] = useState(false);
+
+  const { data, isFetching } = useQuery({
+    queryKey: ["user-nav"],
+    queryFn: async () => await getuser(),
+    refetchOnWindowFocus: false,
+  });
+
+  const userData = data;
+
   return (
-    <nav className="system-padding w-full flex items-center justify-between">
+    <nav className="system-padding w-full flex items-center justify-between border-b-border border-b-solid border-b-[1px]">
       <p className="font-bold text-lg sm:text-2xl">incognitalk.</p>
       <div className="flex items-center gap-4">
         <Dialog onOpenChange={setOpenDialog} open={openDialog}>

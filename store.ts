@@ -14,3 +14,12 @@ export const useOptimisticPost = create<OptimisticPost>()(
     { name: "opt" }
   )
 );
+type UserData = {
+  username: string | null;
+  setUserName: (username: string | null) => void;
+};
+
+export const useUserData = create<UserData>()((set) => ({
+  username: null,
+  setUserName: (username) => set((state) => ({ username: username })),
+}));

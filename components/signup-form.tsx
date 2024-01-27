@@ -8,10 +8,8 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -19,13 +17,12 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import Link from "next/link";
 import { signup } from "@/actions/sign-up";
 import { useRouter } from "next/navigation";
+import { useUserData } from "@/store";
 
 const formSchema = z
   .object({
@@ -60,7 +57,10 @@ export function SignUpForm() {
 
     console.log(success && success, error && error);
 
-    if (error) return;
+    if (error)
+      return form.setError("username", {
+        message: String(error),
+      });
 
     route.push("/feed");
   }

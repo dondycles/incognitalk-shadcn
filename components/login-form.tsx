@@ -26,6 +26,7 @@ import {
 import Link from "next/link";
 import { login } from "@/actions/log-in";
 import { useRouter } from "next/navigation";
+import { useUserData } from "@/store";
 
 const formSchema = z.object({
   username: z.string().min(1, {
