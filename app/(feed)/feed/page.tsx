@@ -37,7 +37,7 @@ export default function Feed() {
 
   const [selectedPost, setSelectedPost] = useState<any>(null);
 
-  const { mutate: delete_ } = useMutation({
+  const { mutate: delete_, isPending } = useMutation({
     mutationFn: async () => deletePost(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
@@ -47,8 +47,6 @@ export default function Feed() {
   const deletePost = async () => {
     const { error, success } = await deletepost(selectedPost.id);
     if (error) return;
-
-    setSelectedPost(null);
   };
 
   return (
@@ -89,7 +87,10 @@ export default function Feed() {
           ))
         : publicPosts?.success?.map((post) => {
             return (
-              <Card key={post.id}>
+              <Card
+                key={post.id}
+                className={`${post.id === selectedPost?.id && "opacity-50"}`}
+              >
                 <CardHeader>
                   <div className="flex flex-row items-start gap-4 w-full">
                     <UserCircle className="w-10 h-10" />
@@ -100,11 +101,7 @@ export default function Feed() {
                       </p>
                     </div>
                     {post.author === userData?.id && (
-                      <DropdownMenu
-                        onOpenChange={() => {
-                          setSelectedPost(post);
-                        }}
-                      >
+                      <DropdownMenu>
                         <DropdownMenuTrigger className="ml-auto mr-0">
                           <ChevronDown />
                         </DropdownMenuTrigger>
