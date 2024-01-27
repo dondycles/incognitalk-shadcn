@@ -35,7 +35,7 @@ export default function Feed() {
   const publicPosts = posts;
   const userData = user?.success?.user;
 
-  const [selectedPost, setSelectedPost] = useState<any>();
+  const [selectedPost, setSelectedPost] = useState<any>(null);
 
   const { mutate: delete_ } = useMutation({
     mutationFn: async () => deletePost(),
@@ -47,6 +47,8 @@ export default function Feed() {
   const deletePost = async () => {
     const { error, success } = await deletepost(selectedPost.id);
     if (error) return;
+
+    setSelectedPost(null);
   };
 
   return (
@@ -98,11 +100,12 @@ export default function Feed() {
                       </p>
                     </div>
                     {post.author === userData?.id && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          onClick={() => setSelectedPost(post)}
-                          className="ml-auto mr-0"
-                        >
+                      <DropdownMenu
+                        onOpenChange={() => {
+                          setSelectedPost(post);
+                        }}
+                      >
+                        <DropdownMenuTrigger className="ml-auto mr-0">
                           <ChevronDown />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
