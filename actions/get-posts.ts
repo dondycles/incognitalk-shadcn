@@ -1,7 +1,8 @@
 "use server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
-export const getposts = async () => {
+export const getposts = async (page: number) => {
+  console.log(page);
   const cookieStore = cookies();
 
   const supabase = createServerClient(
@@ -26,7 +27,7 @@ export const getposts = async () => {
     .from("posts")
     .select("*, users(*)")
     .order("created_at", { ascending: false })
-    .limit(10);
+    .range(page === 1 ? 0 : page * 10, page === 1 ? 9 : page * 10 + 9);
 
   if (error) return { error: error };
 

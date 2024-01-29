@@ -20,6 +20,7 @@ export const post = async (values?: any) => {
     .from("posts")
     .insert({
       content: values.content,
+      privacy: values.privacy,
     })
     .select();
 

@@ -33,7 +33,7 @@ export default function FeedNav() {
     refetchOnWindowFocus: false,
   });
 
-  const userData = data;
+  const userData = data?.success;
 
   return (
     <nav className="system-padding w-full flex items-center justify-between border-b-border border-b-solid border-b-[1px]">

@@ -12,7 +12,14 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { post } from "@/actions/post";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -22,6 +29,7 @@ const formSchema = z.object({
   content: z.string().min(1, {
     message: "A message cannot be empty.",
   }),
+  privacy: z.string(),
 });
 
 export function AddPostForm({ close }: { close: () => void }) {
@@ -42,19 +50,20 @@ export function AddPostForm({ close }: { close: () => void }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       content: "",
+      privacy: "public",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { error, success } = await post(values);
-    console.log(error, success);
     if (error) return form.setError("content", { message: error.message });
-    close();
     form.reset();
+
+    close();
   }
 
   useEffect(() => {
-    optimisticPost.setContent(isPending ? variables.content : null);
+    optimisticPost.setData(isPending ? variables : null);
   }, [isPending]);
 
   return (
@@ -72,7 +81,7 @@ export function AddPostForm({ close }: { close: () => void }) {
             <FormItem>
               <FormControl>
                 <Textarea
-                  rows={5}
+                  rows={4}
                   placeholder="What are your thoughts?"
                   {...field}
                 />
@@ -81,13 +90,37 @@ export function AddPostForm({ close }: { close: () => void }) {
             </FormItem>
           )}
         />
-        <Button
-          className="w-fit ml-auto mr-0"
-          type="submit"
-          disabled={form.formState.isSubmitting}
-        >
-          Post
-        </Button>
+
+        <div className="flex justify-end gap-4">
+          <FormField
+            control={form.control}
+            name="privacy"
+            render={({ field }) => (
+              <FormItem>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Public" />
+                  </SelectTrigger>
+                  <SelectContent className="">
+                    <SelectItem value={"public"}>Public</SelectItem>
+                    <SelectItem value={"private"}>Private</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            className="w-fit"
+            type="submit"
+            disabled={form.formState.isSubmitting}
+          >
+            Post
+          </Button>
+        </div>
       </form>
     </Form>
   );

@@ -1,12 +1,30 @@
 "use client";
 import { getposts } from "@/actions/get-posts";
 import { AddPostForm } from "@/components/add-post-form";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useIntersection } from "@mantine/hooks";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOptimisticPost } from "@/store";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronDown, Pencil, Trash, UserCircle } from "lucide-react";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  ChevronDown,
+  Globe,
+  Lock,
+  Pencil,
+  Trash,
+  UserCircle,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,16 +33,30 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getauth } from "@/actions/get-auth";
 import { deletepost } from "@/actions/delete-post";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import PostCard from "@/components/post-card";
 
 export default function Feed() {
   const queryClient = useQueryClient();
 
   const optimisticPost = useOptimisticPost();
 
-  const { data: posts, isLoading } = useQuery({
+  const {
+    data: posts,
+    isLoading,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ["posts"],
-    queryFn: async () => await getposts(),
+    queryFn: async ({ pageParam }) => {
+      const { success, error } = await getposts(pageParam);
+      return success;
+    },
+    getNextPageParam: (_, pages) => {
+      return pages.length + 1;
+    },
+    initialPageParam: 1,
   });
 
   const { data: user } = useQuery({
@@ -32,7 +64,8 @@ export default function Feed() {
     queryFn: async () => await getauth(),
   });
 
-  const publicPosts = posts;
+  const publicPosts = posts?.pages.flatMap((page) => page);
+
   const userData = user?.success?.user;
 
   const [selectedPost, setSelectedPost] = useState<any>(null);
@@ -49,10 +82,27 @@ export default function Feed() {
     if (error) return;
   };
 
+  const lastPost = useRef<HTMLDivElement>(null);
+  const { ref: veryLastPost, entry } = useIntersection({
+    root: lastPost.current,
+    threshold: 1,
+  });
+
+  useEffect(() => {
+    if (entry?.isIntersecting) fetchNextPage();
+  }, [entry]);
+
   return (
     <div className="system-padding h-full w-full space-y-4">
-      <AddPostForm close={() => {}} />
-      {optimisticPost.content && (
+      <Card>
+        <CardHeader>
+          <CardDescription>Create Post</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AddPostForm close={() => {}} />
+        </CardContent>
+      </Card>
+      {optimisticPost.data && optimisticPost.data.privacy != "private" && (
         <Card className="opacity-50">
           <CardHeader>
             <div className="flex flex-row items-center gap-4">
@@ -64,7 +114,7 @@ export default function Feed() {
             </div>
           </CardHeader>
           <CardContent className="whitespace-pre">
-            {optimisticPost.content}
+            {optimisticPost.data.content}
           </CardContent>
         </Card>
       )}
@@ -85,50 +135,38 @@ export default function Feed() {
               </CardContent>
             </Card>
           ))
-        : publicPosts?.success?.map((post) => {
+        : publicPosts?.map((post, i) => {
+            if (i === publicPosts.length - 1) {
+              return (
+                <PostCard
+                  key={post.id}
+                  ref={veryLastPost}
+                  deletee={() => {
+                    setSelectedPost(post);
+                    delete_();
+                  }}
+                  post={post}
+                  selectedPost={selectedPost}
+                  userData={userData}
+                />
+              );
+            }
             return (
-              <Card
+              <PostCard
                 key={post.id}
-                className={`${post.id === selectedPost?.id && "opacity-50"}`}
-              >
-                <CardHeader>
-                  <div className="flex flex-row items-start gap-4 w-full">
-                    <UserCircle className="w-10 h-10" />
-                    <div className="flex flex-col">
-                      <p>{post.users?.username}</p>
-                      <p className="text-muted-foreground text-xs">
-                        {new Date(post.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    {post.author === userData?.id && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger className="ml-auto mr-0">
-                          <ChevronDown />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Pencil className="w-4 h-4 mr-2" /> Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setSelectedPost(post);
-                              delete_();
-                            }}
-                          >
-                            <Trash className="w-4 h-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent className="whitespace-pre">
-                  {post.content}
-                </CardContent>
-              </Card>
+                deletee={() => {
+                  setSelectedPost(post);
+                  delete_();
+                }}
+                post={post}
+                selectedPost={selectedPost}
+                userData={userData}
+              />
             );
           })}
+      {isFetchingNextPage && (
+        <p className="text-xs text-muted-foreground">loading more...</p>
+      )}
     </div>
   );
 }

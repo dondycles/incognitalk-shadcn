@@ -40,7 +40,7 @@ export default function UserNavButton({ userData }: { userData: any }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel>{userData?.dbData?.username}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <User className="w-4 h-4 mr-2" />
