@@ -58,7 +58,6 @@ export function AddPostForm({ close }: { close: () => void }) {
     const { error, success } = await post(values);
     if (error) return form.setError("content", { message: error.message });
     form.reset();
-
     close();
   }
 
@@ -114,6 +113,16 @@ export function AddPostForm({ close }: { close: () => void }) {
               </FormItem>
             )}
           />
+          <Button
+            onClick={() => {
+              form.reset();
+              close();
+            }}
+            className="w-fit"
+            variant="outline"
+          >
+            Discard
+          </Button>
           <Button
             className="w-fit"
             type="submit"

@@ -117,7 +117,11 @@ export default function Feed() {
             <CardDescription>Create Post</CardDescription>
           </CardHeader>
           <CardContent>
-            <AddPostForm close={() => {}} />
+            <AddPostForm
+              close={() => {
+                setIsCreatePost(false);
+              }}
+            />
           </CardContent>
         </Card>
       )}
