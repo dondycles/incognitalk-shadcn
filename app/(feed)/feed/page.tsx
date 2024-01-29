@@ -165,25 +165,23 @@ export default function Feed() {
                     setSelectedPost(post);
                     delete_();
                   }}
-                  postId={post?.id}
                   selectedPost={selectedPost}
                   userData={userData}
+                  postData={post}
                 />
               );
             }
             return (
-              <Suspense fallback={<p>Loading post</p>}>
-                <PostCard
-                  key={post?.id}
-                  deletee={() => {
-                    setSelectedPost(post);
-                    delete_();
-                  }}
-                  postId={post?.id}
-                  selectedPost={selectedPost}
-                  userData={userData}
-                />
-              </Suspense>
+              <PostCard
+                key={post?.id}
+                deletee={() => {
+                  setSelectedPost(post);
+                  delete_();
+                }}
+                selectedPost={selectedPost}
+                userData={userData}
+                postData={post}
+              />
             );
           })}
       <div />

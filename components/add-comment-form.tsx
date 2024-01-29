@@ -27,7 +27,7 @@ const formSchema = z.object({
 
 export function AddCommentForm({ postid }: { postid: string }) {
   const optimisticComment = useOptimisticComent();
-  const [queryClient] = useState(() => useQueryClient());
+  const queryClient = useQueryClient();
   const {
     mutate: addComment,
     variables,

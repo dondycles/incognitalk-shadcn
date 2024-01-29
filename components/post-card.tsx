@@ -41,23 +41,24 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { like } from "@/actions/like";
 import { getpost } from "@/actions/get-post";
+import { getlikes } from "@/actions/get-likes";
 
 interface PostCard extends React.HTMLProps<HTMLDivElement> {
-  postId?: string;
   selectedPost?: any[any];
   userData?: any[any];
   deletee: (id: any) => void;
   isOptimistic?: boolean;
   optimisticContent?: any[any];
+  postData?: any[any];
 }
 
 export default function PostCard({
-  postId,
   selectedPost,
   userData,
   deletee,
   isOptimistic,
   optimisticContent,
+  postData,
 }: PostCard) {
   // const {
   //   data: a,
@@ -75,54 +76,54 @@ export default function PostCard({
   //     return pages.length + 1;
   //   },
   // });
+  const [toggleComments, setToggleComments] = useState(false);
   const queryClient = useQueryClient();
+  const optimisticComment = useOptimisticComent();
 
-  const {
-    data: postdata,
-    isFetching: postLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["post", postId],
-    staleTime: 0,
-    queryFn: async () => await getpost(postId as string),
-    retry: true,
-    refetchOnMount: false,
-  });
   const { data: commentsData, isLoading: commentsLoading } = useQuery({
-    queryKey: ["comment", postId],
+    initialData: postData.comments,
+    queryKey: ["comment", postData.id],
     staleTime: 0,
-    queryFn: async () => await getcomments(postId as string),
+    queryFn: async () => {
+      const { success } = await getcomments(postData.id as string);
+      return success;
+    },
     refetchOnMount: false,
   });
+
+  const comments = commentsData;
+
+  const { data: likesData, isLoading: likesLoading } = useQuery({
+    initialData: postData.likes,
+    queryKey: ["likes", postData.id],
+    staleTime: 0,
+    queryFn: async () => {
+      const { success } = await getlikes(postData.id as string);
+      return success;
+    },
+    refetchOnMount: false,
+  });
+
+  const likes = likesData;
 
   const { mutate: _like } = useMutation({
     mutationFn: async () => await likee(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["post", postId],
+        queryKey: ["likes", postData.id],
       });
     },
   });
 
   const likee = async () => {
-    const { error, success } = await like({ type: "post", post: postId });
-    console.log(error, success);
+    await like({ type: "post", post: postData.id });
   };
-
-  const comments = commentsData?.success;
-
-  const postData = postdata?.success;
-
-  const [toggleComments, setToggleComments] = useState(false);
 
   const showComments = comments?.length! > 2 || toggleComments;
 
-  const optimisticComment = useOptimisticComent();
-
   return (
     <Card
-      hidden={isError}
-      className={`${postId === selectedPost?.id && "opacity-50"} ${
+      className={`${postData.id === selectedPost?.id && "opacity-50"} ${
         isOptimistic && "opacity-50"
       } border-transparent border-b-border sm:border-border shadow-none sm:shadow-sm rounded-none sm:rounded-lg`}
     >
@@ -195,9 +196,7 @@ export default function PostCard({
                 variant={"secondary"}
               >
                 <FaRegHeart />
-                {postData.likes?.length ? (
-                  <p className="ml-1">{postData.likes?.length}</p>
-                ) : null}
+                {likes?.length ? <p className="ml-1">{likes?.length}</p> : null}
               </Button>
               <Button
                 onClick={() => {
@@ -220,7 +219,7 @@ export default function PostCard({
                 {optimisticComment.data && (
                   <CommentCard
                     userData={userData}
-                    key={"opt"}
+                    key={optimisticComment.data}
                     comment={optimisticComment.data}
                     isOptimistic={true}
                   />
