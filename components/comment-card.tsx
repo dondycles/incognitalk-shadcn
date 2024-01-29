@@ -30,13 +30,15 @@ export default function CommentCard({
     },
   });
 
+  const isEditable = userData?.id === comment?.users?.id;
+  const isDeletable =
+    userData?.id === comment?.users?.id || comment?.posts?.author;
+
   const deleteComment = async () => {
     const { success, error } = await deletecomment(comment.id);
     console.log(error);
   };
-  console.log("posts author: ", comment.posts.author);
-  console.log("current user: ", userData.id);
-  console.log("commenter: ", comment.users.id);
+
   return (
     <div
       className={`w-full flex flex-row items-start gap-2 ${
@@ -50,28 +52,49 @@ export default function CommentCard({
             <p className="font-semibold">{comment.users.username}</p>
           )}
           <p className="whitespace-pre">{comment.comment}</p>
-        </div>
+        </div>{" "}
         {!isOptimistic && (
           <DropdownMenu>
             <DropdownMenuTrigger>
               <HiDotsVertical />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Pencil className="w-4 h-4 mr-2" /> Edit
-              </DropdownMenuItem>
-              {comment.posts.author === userData.id ? (
-                userData.id === comment.users.id ? (
-                  <DropdownMenuItem
-                    onClick={() => {
-                      delete_();
-                    }}
-                  >
-                    <Trash className="w-4 h-4 mr-2" />
-                    Delete
-                  </DropdownMenuItem>
-                ) : null
-              ) : null}
+              {isEditable && (
+                <DropdownMenuItem>
+                  <Pencil className="w-4 h-4 mr-2" /> Edit
+                </DropdownMenuItem>
+              )}
+
+              {isDeletable && (
+                <DropdownMenuItem
+                  onClick={() => {
+                    delete_();
+                  }}
+                >
+                  <Trash className="w-4 h-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              )}
+
+              {/* {comment.posts.author === userData.id ? (
+                <DropdownMenuItem
+                  onClick={() => {
+                    delete_();
+                  }}
+                >
+                  <Trash className="w-4 h-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              ) : userData.id === comment.users.id ? (
+                <DropdownMenuItem
+                  onClick={() => {
+                    delete_();
+                  }}
+                >
+                  <Trash className="w-4 h-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              ) : null} */}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
