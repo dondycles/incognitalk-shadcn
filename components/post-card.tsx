@@ -111,7 +111,7 @@ export default function PostCard({
 
   const iLikedIt = isLiked.length > 0 ? true : false;
 
-  const { mutate: _like } = useMutation({
+  const { mutate: _like, isPending: likePending } = useMutation({
     mutationFn: async () => await likee(),
     onSuccess: () => {
       queryClient.invalidateQueries({
