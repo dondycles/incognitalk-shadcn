@@ -78,3 +78,7 @@
 .system-padding {
   @apply p-4 sm:px-8 md:px-16 lg:px-32 xl:px-64 2xl:px-96;
 }
+
+.feed-padding {
+  @apply py-4 px-0 sm:px-8 md:px-16 lg:px-32 xl:px-64 2xl:px-96;
+}

@@ -36,7 +36,6 @@ export default function PostCard({
   userData,
   deletee,
   isOptimistic,
-  ...props
 }: PostCard) {
   const { data } = useQuery({
     queryKey: ["comment", post.id],
@@ -51,7 +50,7 @@ export default function PostCard({
     <Card
       className={`${post.id === selectedPost?.id && "opacity-50"} ${
         isOptimistic && "opacity-50"
-      }`}
+      } border-transparent border-b-border sm:border-border shadow-none sm:shadow-sm rounded-none sm:rounded-lg`}
     >
       {isOptimistic ? (
         <>
@@ -105,7 +104,6 @@ export default function PostCard({
           </CardHeader>
           <CardContent className="whitespace-pre">{post.content}</CardContent>
           <CardFooter className="gap-4 flex-col">
-            <Separator />
             <div className="flex flex-col w-full gap-2">
               {optimisticComment.data && (
                 <CommentCard
@@ -125,7 +123,6 @@ export default function PostCard({
                 );
               })}
             </div>
-
             <AddCommentForm postid={post.id} />
           </CardFooter>
         </>

@@ -21,7 +21,9 @@ import {
 import {
   ChevronDown,
   Globe,
+  Loader,
   Lock,
+  LucideLoader2,
   Pencil,
   Trash,
   UserCircle,
@@ -51,6 +53,7 @@ export default function Feed() {
     isLoading,
     fetchNextPage,
     isFetchingNextPage,
+    isFetched,
   } = useInfiniteQuery({
     queryKey: ["posts"],
     queryFn: async ({ pageParam }) => {
@@ -98,9 +101,9 @@ export default function Feed() {
   }, [entry]);
 
   return (
-    <div className="system-padding h-full w-full space-y-4">
+    <div className="feed-padding h-full w-full space-y-4">
       {!isCreatePost ? (
-        <Card>
+        <Card className="border-transparent border-b-border sm:border-border shadow-none sm:shadow-sm rounded-none sm:rounded-lg">
           <CardHeader>
             <div className="flex flex-row gap-4 w-full">
               <Input
@@ -136,7 +139,10 @@ export default function Feed() {
       )}
       {isLoading
         ? Array.from({ length: 10 }, (_, i) => (
-            <Card key={i}>
+            <Card
+              key={i}
+              className="border-transparent border-b-border sm:border-border shadow-none sm:shadow-sm rounded-none sm:rounded-lg"
+            >
               <CardHeader>
                 <div className="flex flex-row items-center gap-4">
                   <Skeleton className="w-10 h-10 rounded-full" />
@@ -156,7 +162,6 @@ export default function Feed() {
               return (
                 <PostCard
                   key={post.id}
-                  ref={veryLastPost}
                   deletee={() => {
                     setSelectedPost(post);
                     delete_();
@@ -180,9 +185,17 @@ export default function Feed() {
               />
             );
           })}
+      <div />
       {isFetchingNextPage && (
-        <p className="text-xs text-muted-foreground">loading more...</p>
+        <div className="text-xs text-muted-foreground flex items-center gap-2 justify-center">
+          <p>loading more...</p>
+          <LucideLoader2 className=" animate-spin" />
+        </div>
       )}
+      <div
+        ref={veryLastPost}
+        className="pointer-events-none h-0 w-0 m-0 p-0 opacity-0"
+      />
     </div>
   );
 }
