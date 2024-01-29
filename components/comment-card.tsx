@@ -34,7 +34,8 @@ export default function CommentCard({
 
   const isEditable = userData?.id === comment?.users?.id;
   const isDeletable =
-    userData?.id === comment?.users?.id || comment?.posts?.author;
+    userData?.id === comment?.users?.id ||
+    userData?.id === comment?.posts?.author;
 
   const [editing, setEditing] = useState(false);
 
@@ -81,6 +82,9 @@ export default function CommentCard({
                     </DropdownMenuItem>
                   )}
 
+                  {!isEditable && !isDeletable && (
+                    <DropdownMenuItem>Can't do actions</DropdownMenuItem>
+                  )}
                   {/* {comment.posts.author === userData.id ? (
                 <DropdownMenuItem
                   onClick={() => {
