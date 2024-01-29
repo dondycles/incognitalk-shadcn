@@ -14,9 +14,9 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useOptimisticComent } from "@/store";
-import { Input } from "./ui/input";
 import { comment } from "@/actions/comment";
 import { Button } from "./ui/button";
+import { Textarea } from "./ui/textarea";
 
 const formSchema = z.object({
   comment: z.string().min(1, {
@@ -71,7 +71,11 @@ export function AddCommentForm({ postid }: { postid: string }) {
           render={({ field }) => (
             <FormItem className="flex-1">
               <FormControl>
-                <Input placeholder="Do you have any comments?" {...field} />
+                <Textarea
+                  cols={1}
+                  placeholder="Do you have any comments?"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

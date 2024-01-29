@@ -20,6 +20,7 @@ import { getcomments } from "@/actions/get-comments";
 import { useOptimisticComent } from "@/store";
 import CommentCard from "./comment-card";
 import { Skeleton } from "./ui/skeleton";
+import { HiDotsVertical } from "react-icons/hi";
 
 interface PostCard extends React.HTMLProps<HTMLDivElement> {
   post?: any[any];
@@ -83,7 +84,7 @@ export default function PostCard({
               {post.author === userData?.id && (
                 <DropdownMenu>
                   <DropdownMenuTrigger className="ml-auto mr-0">
-                    <ChevronDown />
+                    <HiDotsVertical />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem>
@@ -108,13 +109,20 @@ export default function PostCard({
             <div className="flex flex-col w-full gap-2">
               {optimisticComment.data && (
                 <CommentCard
+                  userData={userData}
                   key={"opt"}
                   comment={optimisticComment.data}
                   isOptimistic={true}
                 />
               )}
               {comments?.map((comment: any[any]) => {
-                return <CommentCard key={comment.id} comment={comment} />;
+                return (
+                  <CommentCard
+                    userData={userData}
+                    key={comment.id}
+                    comment={comment}
+                  />
+                );
               })}
             </div>
 
