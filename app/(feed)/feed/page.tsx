@@ -6,6 +6,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -36,11 +37,14 @@ import { deletepost } from "@/actions/delete-post";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import PostCard from "@/components/post-card";
+import { Input } from "@/components/ui/input";
 
 export default function Feed() {
   const queryClient = useQueryClient();
 
   const optimisticPost = useOptimisticPost();
+
+  const [isCreatePost, setIsCreatePost] = useState(false);
 
   const {
     data: posts,
@@ -83,6 +87,7 @@ export default function Feed() {
   };
 
   const lastPost = useRef<HTMLDivElement>(null);
+
   const { ref: veryLastPost, entry } = useIntersection({
     root: lastPost.current,
     threshold: 1,
@@ -94,14 +99,29 @@ export default function Feed() {
 
   return (
     <div className="system-padding h-full w-full space-y-4">
-      <Card>
-        <CardHeader>
-          <CardDescription>Create Post</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <AddPostForm close={() => {}} />
-        </CardContent>
-      </Card>
+      {!isCreatePost ? (
+        <Card>
+          <CardHeader>
+            <div className="flex flex-row gap-4 w-full">
+              <Input
+                onFocus={() => setIsCreatePost(true)}
+                placeholder="Got something to share?"
+              />
+              <Button onClick={() => setIsCreatePost(true)}>Create Post</Button>
+            </div>
+          </CardHeader>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardDescription>Create Post</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AddPostForm close={() => {}} />
+          </CardContent>
+        </Card>
+      )}
+
       {optimisticPost.data && optimisticPost.data.privacy != "private" && (
         <Card className="opacity-50">
           <CardHeader>

@@ -81,6 +81,7 @@ export function AddPostForm({ close }: { close: () => void }) {
             <FormItem>
               <FormControl>
                 <Textarea
+                  autoFocus={true}
                   rows={4}
                   placeholder="What are your thoughts?"
                   {...field}

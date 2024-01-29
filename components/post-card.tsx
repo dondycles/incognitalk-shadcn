@@ -35,12 +35,12 @@ export default function PostCard({
           <UserCircle className="w-10 h-10" />
           <div className="flex flex-col">
             <p>{post.users?.username}</p>
-            <div className="flex flex-row gap-2 text-muted-foreground">
+            <div className="flex flex-row gap-1 items-center text-muted-foreground">
               <p className="text-xs">
                 {new Date(post.created_at).toLocaleDateString()}
               </p>
-              {post.privacy === "public" && <Globe className="w-4 h-4 " />}
-              {post.privacy === "private" && <Lock className="w-4 h-4" />}
+              {post.privacy === "public" && <Globe className="w-3 h-3 " />}
+              {post.privacy === "private" && <Lock className="w-3 h-3" />}
             </div>
           </div>
           {post.author === userData?.id && (
