@@ -102,7 +102,7 @@ export default function Feed() {
   return (
     <div className="feed-padding h-full w-full space-y-4">
       {!isCreatePost ? (
-        <Card className="border-transparent border-b-border sm:border-border shadow-none sm:shadow-sm rounded-none sm:rounded-lg">
+        <Card className="border-transparent border-b-border sm:border-border shadow-none sm:shadow-sm rounded-none sm:rounded-lg ">
           <CardHeader>
             <div className="flex flex-row gap-4 w-full">
               <Input
@@ -114,7 +114,7 @@ export default function Feed() {
           </CardHeader>
         </Card>
       ) : (
-        <Card>
+        <Card className="border-transparent border-b-border sm:border-border shadow-none sm:shadow-sm rounded-none sm:rounded-lg ">
           <CardHeader>
             <CardDescription>Create Post</CardDescription>
           </CardHeader>
