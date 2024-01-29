@@ -9,6 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { useState } from "react";
+import { EditCommentForm } from "./edit-comment-form";
 
 export default function CommentCard({
   comment,
@@ -34,6 +36,8 @@ export default function CommentCard({
   const isDeletable =
     userData?.id === comment?.users?.id || comment?.posts?.author;
 
+  const [editing, setEditing] = useState(false);
+
   const deleteComment = async () => {
     const { success, error } = await deletecomment(comment.id);
     console.log(error);
@@ -47,36 +51,37 @@ export default function CommentCard({
     >
       <UserCircle />
       <div className="flex-1 flex flex-row rounded-[0.5rem] bg-secondary p-2 items-start">
-        <div className="flex-1">
+        <div className="flex-1 flex flex-col">
           {!isOptimistic && (
-            <p className="font-semibold">{comment.users.username}</p>
-          )}
-          <p className="whitespace-pre">{comment.comment}</p>
-        </div>{" "}
-        {!isOptimistic && (
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <HiDotsVertical />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {isEditable && (
-                <DropdownMenuItem>
-                  <Pencil className="w-4 h-4 mr-2" /> Edit
-                </DropdownMenuItem>
-              )}
+            <div className="flex flex-row">
+              <p className="font-semibold flex-1">{comment.users.username}</p>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <HiDotsVertical />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {isEditable && (
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setEditing(true);
+                      }}
+                    >
+                      <Pencil className="w-4 h-4 mr-2" /> Edit
+                    </DropdownMenuItem>
+                  )}
 
-              {isDeletable && (
-                <DropdownMenuItem
-                  onClick={() => {
-                    delete_();
-                  }}
-                >
-                  <Trash className="w-4 h-4 mr-2" />
-                  Delete
-                </DropdownMenuItem>
-              )}
+                  {isDeletable && (
+                    <DropdownMenuItem
+                      onClick={() => {
+                        delete_();
+                      }}
+                    >
+                      <Trash className="w-4 h-4 mr-2" />
+                      Delete
+                    </DropdownMenuItem>
+                  )}
 
-              {/* {comment.posts.author === userData.id ? (
+                  {/* {comment.posts.author === userData.id ? (
                 <DropdownMenuItem
                   onClick={() => {
                     delete_();
@@ -95,9 +100,19 @@ export default function CommentCard({
                   Delete
                 </DropdownMenuItem>
               ) : null} */}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
+          {editing ? (
+            <EditCommentForm
+              onSuccess={() => setEditing(false)}
+              comment={comment}
+            />
+          ) : (
+            <p className="whitespace-pre">{comment.comment}</p>
+          )}
+        </div>
       </div>
       {/* {!isOptimistic && userData.id === comment.users.id && (
         <Button onClick={() => delete_()} size={"icon"} variant={"destructive"}>
