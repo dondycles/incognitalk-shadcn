@@ -42,6 +42,7 @@ import { Button } from "./ui/button";
 import { like } from "@/actions/like";
 import { getpost } from "@/actions/get-post";
 import { getlikes } from "@/actions/get-likes";
+import { unlike } from "@/actions/unlike";
 
 interface PostCard extends React.HTMLProps<HTMLDivElement> {
   selectedPost?: any[any];
@@ -104,7 +105,11 @@ export default function PostCard({
     refetchOnMount: false,
   });
 
-  const likes = likesData;
+  const likes: [] = likesData;
+
+  const isLiked = likes.filter((like: any[any]) => like.liker === userData?.id);
+
+  const iLikedIt = isLiked.length > 0 ? true : false;
 
   const { mutate: _like } = useMutation({
     mutationFn: async () => await likee(),
@@ -116,7 +121,17 @@ export default function PostCard({
   });
 
   const likee = async () => {
-    await like({ type: "post", post: postData.id });
+    if (likesLoading) return;
+    if (iLikedIt) {
+      const { error } = await unlike(userData.id);
+      console.log(error);
+      return;
+    }
+    if (!iLikedIt) {
+      const { error } = await like({ type: "post", post: postData.id });
+      console.log(error);
+      return;
+    }
   };
 
   const showComments = comments?.length! > 2 || toggleComments;
@@ -193,7 +208,7 @@ export default function PostCard({
                   _like();
                 }}
                 size={"sm"}
-                variant={"secondary"}
+                variant={iLikedIt ? "default" : "secondary"}
               >
                 <FaRegHeart />
                 {likes?.length ? <p className="ml-1">{likes?.length}</p> : null}
