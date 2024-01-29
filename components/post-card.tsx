@@ -1,11 +1,23 @@
 import {
   ChevronDown,
   Globe,
+  Heart,
   Lock,
   Pencil,
+  Quote,
+  Share,
+  Share2,
   Trash,
   UserCircle,
 } from "lucide-react";
+import {
+  FaComment,
+  FaHeart,
+  FaRegComment,
+  FaRegHeart,
+  FaRegShareFromSquare,
+  FaShare,
+} from "react-icons/fa6";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import {
   DropdownMenu,
@@ -13,42 +25,104 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Separator } from "./ui/separator";
 import { AddCommentForm } from "./add-comment-form";
-import { useQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { getcomments } from "@/actions/get-comments";
 import { useOptimisticComent } from "@/store";
 import CommentCard from "./comment-card";
 import { Skeleton } from "./ui/skeleton";
 import { HiDotsVertical } from "react-icons/hi";
+import { useState } from "react";
+import { Button } from "./ui/button";
+import { like } from "@/actions/like";
+import { getpost } from "@/actions/get-post";
 
 interface PostCard extends React.HTMLProps<HTMLDivElement> {
-  post?: any[any];
+  postId?: string;
   selectedPost?: any[any];
   userData?: any[any];
   deletee: (id: any) => void;
   isOptimistic?: boolean;
+  optimisticContent?: any[any];
 }
 
 export default function PostCard({
-  post,
+  postId,
   selectedPost,
   userData,
   deletee,
   isOptimistic,
+  optimisticContent,
 }: PostCard) {
-  const { data } = useQuery({
-    queryKey: ["comment", post.id],
-    queryFn: async () => await getcomments(post),
+  // const {
+  //   data: a,
+  //   error,
+  //   fetchNextPage,
+  //   isFetchingNextPage,
+  // } = useInfiniteQuery({
+  //   queryKey: ["comment", post.id],
+  //   queryFn: async () => {
+  //     const { success } = await getcomments(post);
+  //     return success;
+  //   },
+  //   initialPageParam: 1,
+  //   getNextPageParam: (_, pages) => {
+  //     return pages.length + 1;
+  //   },
+  // });
+  const queryClient = useQueryClient();
+
+  const {
+    data: postdata,
+    isFetching: postLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["post", postId],
+    staleTime: 0,
+    queryFn: async () => await getpost(postId as string),
+    retry: true,
+    refetchOnMount: false,
+  });
+  const { data: commentsData, isLoading: commentsLoading } = useQuery({
+    queryKey: ["comment", postId],
+    staleTime: 0,
+    queryFn: async () => await getcomments(postId as string),
+    refetchOnMount: false,
   });
 
-  const comments = data?.success;
+  const { mutate: _like } = useMutation({
+    mutationFn: async () => await likee(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["post", postId],
+      });
+    },
+  });
+
+  const likee = async () => {
+    const { error, success } = await like({ type: "post", post: postId });
+    console.log(error, success);
+  };
+
+  const comments = commentsData?.success;
+
+  const postData = postdata?.success;
+
+  const [toggleComments, setToggleComments] = useState(false);
+
+  const showComments = comments?.length! > 2 || toggleComments;
 
   const optimisticComment = useOptimisticComent();
 
   return (
     <Card
-      className={`${post.id === selectedPost?.id && "opacity-50"} ${
+      hidden={isError}
+      className={`${postId === selectedPost?.id && "opacity-50"} ${
         isOptimistic && "opacity-50"
       } border-transparent border-b-border sm:border-border shadow-none sm:shadow-sm rounded-none sm:rounded-lg`}
     >
@@ -63,24 +137,30 @@ export default function PostCard({
               </div>
             </div>
           </CardHeader>
-          <CardContent className="whitespace-pre">{post.content}</CardContent>
+          <CardContent className="whitespace-pre">
+            {optimisticContent.content}
+          </CardContent>
         </>
-      ) : (
+      ) : postData ? (
         <>
           <CardHeader>
             <div className="flex flex-row items-start gap-4 w-full">
               <UserCircle className="w-10 h-10" />
               <div className="flex flex-col">
-                <p className="font-semibold">{post.users?.username}</p>
+                <p className="font-semibold">{postData.users?.username}</p>
                 <div className="flex flex-row gap-1 items-center text-muted-foreground">
                   <p className="text-xs">
-                    {new Date(post.created_at).toLocaleDateString()}
+                    {new Date(postData.created_at).toLocaleDateString()}
                   </p>
-                  {post.privacy === "public" && <Globe className="w-3 h-3 " />}
-                  {post.privacy === "private" && <Lock className="w-3 h-3" />}
+                  {postData.privacy === "public" && (
+                    <Globe className="w-3 h-3 " />
+                  )}
+                  {postData.privacy === "private" && (
+                    <Lock className="w-3 h-3" />
+                  )}
                 </div>
               </div>
-              {post.author === userData?.id && (
+              {postData.author === userData?.id && (
                 <DropdownMenu>
                   <DropdownMenuTrigger className="ml-auto mr-0">
                     <HiDotsVertical />
@@ -91,7 +171,7 @@ export default function PostCard({
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => {
-                        deletee(post.id);
+                        deletee(postData.id);
                       }}
                     >
                       <Trash className="w-4 h-4 mr-2" />
@@ -102,29 +182,84 @@ export default function PostCard({
               )}
             </div>
           </CardHeader>
-          <CardContent className="whitespace-pre">{post.content}</CardContent>
-          <CardFooter className="gap-4 flex-col">
-            <div className="flex flex-col w-full gap-2">
-              {optimisticComment.data && (
-                <CommentCard
-                  userData={userData}
-                  key={"opt"}
-                  comment={optimisticComment.data}
-                  isOptimistic={true}
-                />
-              )}
-              {comments?.map((comment: any[any]) => {
-                return (
+          <CardContent className="whitespace-pre">
+            {postData.content}
+          </CardContent>
+          <CardFooter className={`gap-4 flex-col`}>
+            <div className="grid grid-cols-3 gap-4 w-full">
+              <Button
+                onClick={() => {
+                  _like();
+                }}
+                size={"sm"}
+                variant={"secondary"}
+              >
+                <FaRegHeart />
+                {postData.likes?.length ? (
+                  <p className="ml-1">{postData.likes?.length}</p>
+                ) : null}
+              </Button>
+              <Button
+                onClick={() => {
+                  setToggleComments((prev) => !prev);
+                }}
+                size={"sm"}
+                variant={"secondary"}
+              >
+                <FaRegComment />{" "}
+                {comments?.length ? (
+                  <p className="ml-1">{comments?.length!}</p>
+                ) : null}
+              </Button>
+              <Button size={"sm"} variant={"secondary"}>
+                <FaRegShareFromSquare />
+              </Button>
+            </div>
+            {showComments && (
+              <div className="flex flex-col w-full gap-2">
+                {optimisticComment.data && (
                   <CommentCard
                     userData={userData}
-                    key={comment.id}
-                    comment={comment}
+                    key={"opt"}
+                    comment={optimisticComment.data}
+                    isOptimistic={true}
                   />
-                );
-              })}
-            </div>
-            <AddCommentForm postid={post.id} />
+                )}
+
+                {commentsLoading ? (
+                  <p className="text-muted-foreground text-xs">
+                    loading comments...
+                  </p>
+                ) : showComments ? (
+                  comments?.map((comment: any[any]) => {
+                    return (
+                      <CommentCard
+                        userData={userData}
+                        key={comment.id}
+                        comment={comment}
+                      />
+                    );
+                  })
+                ) : null}
+              </div>
+            )}
+            {showComments && <AddCommentForm postid={postData.id} />}
           </CardFooter>
+        </>
+      ) : (
+        <>
+          <CardHeader>
+            <div className="flex flex-row items-center gap-4">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <div className="flex flex-col gap-1">
+                <Skeleton className="w-24 h-4" />
+                <Skeleton className="w-24 h-4" />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="whitespace-pre">
+            <Skeleton className="w-full h-8" />
+          </CardContent>
         </>
       )}
     </Card>

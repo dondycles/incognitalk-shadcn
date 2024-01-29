@@ -85,25 +85,6 @@ export default function CommentCard({
                   {!isEditable && !isDeletable && (
                     <DropdownMenuItem>Can't do actions</DropdownMenuItem>
                   )}
-                  {/* {comment.posts.author === userData.id ? (
-                <DropdownMenuItem
-                  onClick={() => {
-                    delete_();
-                  }}
-                >
-                  <Trash className="w-4 h-4 mr-2" />
-                  Delete
-                </DropdownMenuItem>
-              ) : userData.id === comment.users.id ? (
-                <DropdownMenuItem
-                  onClick={() => {
-                    delete_();
-                  }}
-                >
-                  <Trash className="w-4 h-4 mr-2" />
-                  Delete
-                </DropdownMenuItem>
-              ) : null} */}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -118,11 +99,6 @@ export default function CommentCard({
           )}
         </div>
       </div>
-      {/* {!isOptimistic && userData.id === comment.users.id && (
-        <Button onClick={() => delete_()} size={"icon"} variant={"destructive"}>
-          <Trash />
-        </Button>
-      )} */}
     </div>
   );
 }

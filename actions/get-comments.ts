@@ -25,7 +25,8 @@ export const getcomments = async (post?: any[any]) => {
     .from("comments")
     .select("*, users(*), posts(*))")
     .order("created_at", { ascending: false })
-    .eq("post", post.id);
+    .eq("post", post)
+    .limit(4);
   // .range(page === 1 ? 0 : page * 10, page === 1 ? 9 : page * 10 + 9);
 
   console.log(data);

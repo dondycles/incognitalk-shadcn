@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getauth } from "@/actions/get-auth";
 import { deletepost } from "@/actions/delete-post";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import PostCard from "@/components/post-card";
 import { Input } from "@/components/ui/input";
@@ -53,7 +53,6 @@ export default function Feed() {
     isLoading,
     fetchNextPage,
     isFetchingNextPage,
-    isFetched,
   } = useInfiniteQuery({
     queryKey: ["posts"],
     queryFn: async ({ pageParam }) => {
@@ -134,7 +133,7 @@ export default function Feed() {
           isOptimistic={true}
           key={"opt"}
           deletee={() => {}}
-          post={optimisticPost.data}
+          optimisticContent={optimisticPost.data}
         />
       )}
       {isLoading
@@ -161,28 +160,30 @@ export default function Feed() {
             if (i === publicPosts.length - 1) {
               return (
                 <PostCard
-                  key={post.id}
+                  key={post?.id}
                   deletee={() => {
                     setSelectedPost(post);
                     delete_();
                   }}
-                  post={post}
+                  postId={post?.id}
                   selectedPost={selectedPost}
                   userData={userData}
                 />
               );
             }
             return (
-              <PostCard
-                key={post.id}
-                deletee={() => {
-                  setSelectedPost(post);
-                  delete_();
-                }}
-                post={post}
-                selectedPost={selectedPost}
-                userData={userData}
-              />
+              <Suspense fallback={<p>Loading post</p>}>
+                <PostCard
+                  key={post?.id}
+                  deletee={() => {
+                    setSelectedPost(post);
+                    delete_();
+                  }}
+                  postId={post?.id}
+                  selectedPost={selectedPost}
+                  userData={userData}
+                />
+              </Suspense>
             );
           })}
       <div />
