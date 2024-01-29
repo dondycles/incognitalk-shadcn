@@ -105,11 +105,11 @@ export default function PostCard({
     refetchOnMount: false,
   });
 
-  const likes: [] = likesData;
+  const likes = likesData.filter(
+    (like: any[any]) => like.liker === userData?.id
+  );
 
-  const isLiked = likes.filter((like: any[any]) => like.liker === userData?.id);
-
-  const iLikedIt = isLiked.length > 0 ? true : false;
+  const isLiked = likes.length > 0 ? true : false;
 
   const { mutate: _like, isPending: likePending } = useMutation({
     mutationFn: async () => await likee(),
@@ -122,12 +122,12 @@ export default function PostCard({
 
   const likee = async () => {
     if (likesLoading) return;
-    if (iLikedIt) {
+    if (isLiked) {
       const { error } = await unlike(userData.id);
       console.log(error);
       return;
     }
-    if (!iLikedIt) {
+    if (!isLiked) {
       const { error } = await like({ type: "post", post: postData.id });
       console.log(error);
       return;
@@ -208,7 +208,7 @@ export default function PostCard({
                   _like();
                 }}
                 size={"sm"}
-                variant={iLikedIt ? "default" : "secondary"}
+                variant={isLiked ? "default" : "secondary"}
               >
                 <FaRegHeart />
                 {likes?.length ? <p className="ml-1">{likes?.length}</p> : null}
