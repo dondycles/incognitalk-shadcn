@@ -126,21 +126,13 @@ export default function Feed() {
         </Card>
       )}
 
-      {optimisticPost.data && optimisticPost.data.privacy != "private" && (
-        <Card className="opacity-50">
-          <CardHeader>
-            <div className="flex flex-row items-center gap-4">
-              <Skeleton className="w-10 h-10 rounded-full" />
-              <div className="flex flex-col gap-1">
-                <Skeleton className="w-24 h-4" />
-                <Skeleton className="w-24 h-4" />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="whitespace-pre">
-            {optimisticPost.data.content}
-          </CardContent>
-        </Card>
+      {optimisticPost.data && (
+        <PostCard
+          isOptimistic={true}
+          key={"opt"}
+          deletee={() => {}}
+          post={optimisticPost.data}
+        />
       )}
       {isLoading
         ? Array.from({ length: 10 }, (_, i) => (

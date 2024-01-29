@@ -1,8 +1,7 @@
 "use server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
-export const getposts = async (page: number) => {
-  console.log(page);
+export const comment = async (values?: any) => {
   const cookieStore = cookies();
 
   const supabase = createServerClient(
@@ -13,23 +12,18 @@ export const getposts = async (page: number) => {
         get(name: string) {
           return cookieStore.get(name)?.value;
         },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options });
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: "", ...options });
-        },
       },
     }
   );
 
   const { data, error } = await supabase
-    .from("posts")
-    .select("*, users(*), comments(*)")
-    .order("created_at", { ascending: false })
-    .range(page === 1 ? 0 : page * 10, page === 1 ? 9 : page * 10 + 9);
+    .from("comments")
+    .insert({
+      comment: values.comment,
+      post: values.postid,
+    })
+    .select();
 
   if (error) return { error: error };
-
   return { success: data };
 };

@@ -22,7 +22,7 @@ import {
 
 import { post } from "@/actions/post";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useOptimisticPost } from "@/store";
 
 const formSchema = z.object({
@@ -37,8 +37,8 @@ export function AddPostForm({ close }: { close: () => void }) {
   const [queryClient] = useState(() => useQueryClient());
   const {
     mutate: addPost,
-    isPending,
     variables,
+    isPending,
   } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => onSubmit(values),
     onSuccess: () => {
@@ -55,15 +55,14 @@ export function AddPostForm({ close }: { close: () => void }) {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    optimisticPost.setData(variables);
+
     const { error, success } = await post(values);
     if (error) return form.setError("content", { message: error.message });
+    optimisticPost.setData(null);
     form.reset();
     close();
   }
-
-  useEffect(() => {
-    optimisticPost.setData(isPending ? variables : null);
-  }, [isPending]);
 
   return (
     <Form {...form}>
@@ -123,12 +122,8 @@ export function AddPostForm({ close }: { close: () => void }) {
           >
             Discard
           </Button>
-          <Button
-            className="w-fit"
-            type="submit"
-            disabled={form.formState.isSubmitting}
-          >
-            Post
+          <Button className="w-fit" type="submit" disabled={isPending}>
+            {isPending ? "Posting..." : "Post"}
           </Button>
         </div>
       </form>

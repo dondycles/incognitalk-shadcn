@@ -1,10 +1,8 @@
 "use server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
-export const getposts = async (page: number) => {
-  console.log(page);
+export const getcomments = async (post?: any[any]) => {
   const cookieStore = cookies();
-
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -24,10 +22,11 @@ export const getposts = async (page: number) => {
   );
 
   const { data, error } = await supabase
-    .from("posts")
-    .select("*, users(*), comments(*)")
+    .from("comments")
+    .select("*, users(*), posts(*))")
     .order("created_at", { ascending: false })
-    .range(page === 1 ? 0 : page * 10, page === 1 ? 9 : page * 10 + 9);
+    .eq("post", post.id);
+  // .range(page === 1 ? 0 : page * 10, page === 1 ? 9 : page * 10 + 9);
 
   if (error) return { error: error };
 
