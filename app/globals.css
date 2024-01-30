@@ -82,3 +82,7 @@
 .feed-padding {
   @apply pb-4 pt-0 px-0 sm:px-8 md:px-16 lg:px-32 xl:px-64 2xl:px-96;
 }
+
+.modified-card {
+  @apply border-transparent border-b-border sm:border-border shadow-none sm:shadow-sm rounded-none sm:rounded-lg;
+}

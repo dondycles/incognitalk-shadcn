@@ -23,7 +23,7 @@ export default function CommentCard({
 }) {
   const queryClient = useQueryClient();
 
-  const { mutate: delete_, isPending } = useMutation({
+  const { mutate: delete_, isPending: deletePending } = useMutation({
     mutationFn: async () => deleteComment(),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -47,7 +47,7 @@ export default function CommentCard({
   return (
     <div
       className={`w-full flex flex-row items-start gap-2 ${
-        isPending && "opacity-50"
+        deletePending && "opacity-50"
       } ${isOptimistic && "opacity-50"}`}
     >
       <UserCircle />

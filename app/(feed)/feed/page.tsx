@@ -6,44 +6,20 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOptimisticPost } from "@/store";
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-import {
-  ChevronDown,
-  Globe,
-  Loader,
-  Lock,
-  LucideLoader2,
-  Pencil,
-  Trash,
-  UserCircle,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { LucideLoader2 } from "lucide-react";
+
 import { getauth } from "@/actions/get-auth";
-import { deletepost } from "@/actions/delete-post";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import PostCard from "@/components/post-card";
 import { Input } from "@/components/ui/input";
 
 export default function Feed() {
-  const queryClient = useQueryClient();
-
   const optimisticPost = useOptimisticPost();
 
   const [isCreatePost, setIsCreatePost] = useState(false);
@@ -63,6 +39,7 @@ export default function Feed() {
       return pages.length + 1;
     },
     initialPageParam: 1,
+    refetchOnMount: false,
   });
 
   const { data: user } = useQuery({
@@ -73,20 +50,6 @@ export default function Feed() {
   const publicPosts = posts?.pages.flatMap((page) => page);
 
   const userData = user?.success?.user;
-
-  const [selectedPost, setSelectedPost] = useState<any>(null);
-
-  const { mutate: delete_, isPending } = useMutation({
-    mutationFn: async () => deletePost(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
-    },
-  });
-
-  const deletePost = async () => {
-    const { error, success } = await deletepost(selectedPost.id);
-    if (error) return;
-  };
 
   const lastPost = useRef<HTMLDivElement>(null);
 
@@ -102,7 +65,7 @@ export default function Feed() {
   return (
     <div className="feed-padding h-full w-full space-y-4">
       {!isCreatePost ? (
-        <Card className="border-transparent border-b-border sm:border-border shadow-none sm:shadow-sm rounded-none sm:rounded-lg ">
+        <Card className="modified-card">
           <CardHeader>
             <div className="flex flex-row gap-4 w-full">
               <Input
@@ -114,7 +77,7 @@ export default function Feed() {
           </CardHeader>
         </Card>
       ) : (
-        <Card className="border-transparent border-b-border sm:border-border shadow-none sm:shadow-sm rounded-none sm:rounded-lg ">
+        <Card className="modified-card">
           <CardHeader>
             <CardDescription>Create Post</CardDescription>
           </CardHeader>
@@ -132,16 +95,12 @@ export default function Feed() {
         <PostCard
           isOptimistic={true}
           key={"opt"}
-          deletee={() => {}}
           optimisticContent={optimisticPost.data}
         />
       )}
       {isLoading
         ? Array.from({ length: 10 }, (_, i) => (
-            <Card
-              key={i}
-              className="border-transparent border-b-border sm:border-border shadow-none sm:shadow-sm rounded-none sm:rounded-lg"
-            >
+            <Card key={i} className="modified-card">
               <CardHeader>
                 <div className="flex flex-row items-center gap-4">
                   <Skeleton className="w-10 h-10 rounded-full" />
@@ -159,30 +118,10 @@ export default function Feed() {
         : publicPosts?.map((post, i) => {
             if (i === publicPosts.length - 1) {
               return (
-                <PostCard
-                  key={post?.id}
-                  deletee={() => {
-                    setSelectedPost(post);
-                    delete_();
-                  }}
-                  selectedPost={selectedPost}
-                  userData={userData}
-                  postData={post}
-                />
+                <PostCard key={post?.id} userData={userData} postData={post} />
               );
             }
-            return (
-              <PostCard
-                key={post?.id}
-                deletee={() => {
-                  setSelectedPost(post);
-                  delete_();
-                }}
-                selectedPost={selectedPost}
-                userData={userData}
-                postData={post}
-              />
-            );
+            return <PostCard userData={userData} postData={post} />;
           })}
       <div />
       {isFetchingNextPage && (

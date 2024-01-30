@@ -36,6 +36,7 @@ export function AddCommentForm({ postid }: { postid: string }) {
     mutationFn: async (values: z.infer<typeof formSchema>) => onSubmit(values),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comment", postid] });
+      queryClient.invalidateQueries({ queryKey: ["commentcount", postid] });
     },
   });
 
