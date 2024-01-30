@@ -99,7 +99,8 @@ export default function PostCard({
     },
     initialPageParam: 1,
   });
-  const comments = commentsData?.pages.flatMap((page) => page);
+  const comments: any = commentsData?.pages.flatMap((page) => page);
+
   const { data: likesData } = useQuery({
     initialData: postData?.likes,
     queryKey: ["likes", postData?.id],
@@ -322,7 +323,7 @@ export default function PostCard({
                     </div>
                   </ScrollArea>
 
-                  {!isView && comments!.length > 3 && (
+                  {!isView && comments?.length > 3 && (
                     <Button
                       onClick={() => setViewPost(true)}
                       size={"sm"}
