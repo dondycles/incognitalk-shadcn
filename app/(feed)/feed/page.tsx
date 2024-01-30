@@ -115,12 +115,7 @@ export default function Feed() {
               </CardContent>
             </Card>
           ))
-        : publicPosts?.map((post, i) => {
-            if (i === publicPosts.length - 1) {
-              return (
-                <PostCard key={post?.id} userData={userData} postData={post} />
-              );
-            }
+        : publicPosts?.map((post) => {
             return (
               <PostCard key={post?.id} userData={userData} postData={post} />
             );

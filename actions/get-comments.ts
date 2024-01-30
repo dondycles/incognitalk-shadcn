@@ -2,10 +2,11 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 export const getcomments = async (
-  post?: any[any],
-  page?: number,
+  post: any[any],
+  page: number,
   isView?: boolean
 ) => {
+  console.log(isView);
   const cookieStore = cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,16 +26,15 @@ export const getcomments = async (
     }
   );
 
-  const max = isView ? 9 : 3;
-  const min = isView ? 10 : 4;
+  const max = isView ? 4 : 1;
+  const min = isView ? 5 : 2;
 
   const { data, error } = await supabase
     .from("comments")
     .select("*, users(*), posts(*))")
     .order("created_at", { ascending: false })
     .eq("post", post)
-    .range(page === 1 ? 0 : page! * min, page === 1 ? max : page! * min + max);
-
+    .range(page === 1 ? 0 : page * min, page === 1 ? max : page * min + max);
   if (error) return { error: error };
 
   return { success: data };

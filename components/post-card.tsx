@@ -2,6 +2,7 @@ import {
   ExternalLink,
   Globe,
   Lock,
+  LucideLoader2,
   Pencil,
   Trash,
   UserCircle,
@@ -30,7 +31,7 @@ import { useOptimisticComent } from "@/store";
 import CommentCard from "./comment-card";
 import { Skeleton } from "./ui/skeleton";
 import { HiDotsVertical, HiExternalLink } from "react-icons/hi";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { like } from "@/actions/like";
 import { getlikes } from "@/actions/get-likes";
@@ -40,6 +41,7 @@ import ViewPostCard from "./view-post-card";
 import { getcommentcount } from "@/actions/get-comment-count";
 import { ScrollArea } from "./ui/scroll-area";
 import Link from "next/link";
+import { useIntersection } from "@mantine/hooks";
 
 interface PostCard extends React.HTMLProps<HTMLDivElement> {
   userData?: any[any];
@@ -81,10 +83,14 @@ export default function PostCard({
     }
   );
 
-  const { data: commentsData, isLoading: commentsLoading } = useInfiniteQuery({
+  const {
+    data: commentsData,
+    isLoading: commentsLoading,
+    fetchNextPage: fetchNextComments,
+    isFetchingNextPage: isFetchingNextComment,
+  } = useInfiniteQuery({
     queryKey: ["comment", postData?.id],
     queryFn: async ({ pageParam }) => {
-      console.log("hi");
       const { success } = await getcomments(
         postData.id as string,
         pageParam,
@@ -92,12 +98,12 @@ export default function PostCard({
       );
       return success;
     },
-    refetchOnMount: true,
     refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    initialPageParam: 1,
     getNextPageParam: (_, pages) => {
       return pages.length + 1;
     },
-    initialPageParam: 1,
   });
   const comments: any = commentsData?.pages.flatMap((page) => page);
 
@@ -118,7 +124,7 @@ export default function PostCard({
 
   const isLiked = findMyLike?.length > 0;
   const [toggleComments, setToggleComments] = useState(false);
-  const showComments = comments?.length! > 2 || toggleComments;
+  const showComments = commentCount?.length! > 2 || toggleComments;
 
   const { mutate: _like, isPending: likePending } = useMutation({
     mutationFn: async () => await likePost(),
@@ -161,6 +167,17 @@ export default function PostCard({
 
     return () => clearTimeout(timeout);
   }, [likePending]);
+
+  const lastComment = useRef<HTMLDivElement>(null);
+
+  const { ref: veryLastComment, entry } = useIntersection({
+    root: lastComment.current,
+    threshold: 1,
+  });
+
+  useEffect(() => {
+    if (entry?.isIntersecting) fetchNextComments();
+  }, [entry]);
 
   return (
     <Card
@@ -291,15 +308,30 @@ export default function PostCard({
                               loading comments...
                             </p>
                           ) : showComments ? (
-                            comments?.map((comment: any[any]) => {
-                              return (
-                                <CommentCard
-                                  userData={userData}
-                                  key={comment.id}
-                                  comment={comment}
-                                />
-                              );
-                            })
+                            <>
+                              {comments?.map((comment: any[any]) => {
+                                return (
+                                  <CommentCard
+                                    userData={userData}
+                                    key={comment.id}
+                                    comment={comment}
+                                  />
+                                );
+                              })}
+
+                              <div
+                                ref={veryLastComment}
+                                className="pointer-events-none h-0 w-0 m-0 p-0 opacity-0"
+                              >
+                                HI
+                              </div>
+                              {isFetchingNextComment && (
+                                <div className="text-xs text-muted-foreground flex items-center gap-2 justify-center">
+                                  <p>loading more...</p>
+                                  <LucideLoader2 className=" animate-spin" />
+                                </div>
+                              )}
+                            </>
                           ) : null}
                         </>
                       ) : (
@@ -324,7 +356,7 @@ export default function PostCard({
                     </div>
                   </ScrollArea>
 
-                  {!isView && comments?.length > 3 && (
+                  {!isView && (commentCount?.length as number) > 2 && (
                     <Button
                       onClick={() => setViewPost(true)}
                       size={"sm"}

@@ -12,15 +12,18 @@ import {
 import { useState } from "react";
 import { EditCommentForm } from "./edit-comment-form";
 
+interface CommentCard extends React.HTMLProps<HTMLDivElement> {
+  comment: any[any];
+  userData: any[any];
+  isOptimistic?: boolean;
+}
+
 export default function CommentCard({
   comment,
   isOptimistic,
   userData,
-}: {
-  comment: any[any];
-  userData: any[any];
-  isOptimistic?: boolean;
-}) {
+  ...props
+}: CommentCard) {
   const queryClient = useQueryClient();
 
   const { mutate: delete_, isPending: deletePending } = useMutation({
