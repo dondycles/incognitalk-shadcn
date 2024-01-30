@@ -121,7 +121,9 @@ export default function Feed() {
                 <PostCard key={post?.id} userData={userData} postData={post} />
               );
             }
-            return <PostCard userData={userData} postData={post} />;
+            return (
+              <PostCard key={post?.id} userData={userData} postData={post} />
+            );
           })}
       <div />
       {isFetchingNextPage && (

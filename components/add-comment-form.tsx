@@ -37,6 +37,7 @@ export function AddCommentForm({ postid }: { postid: string }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comment", postid] });
       queryClient.invalidateQueries({ queryKey: ["commentcount", postid] });
+      queryClient.invalidateQueries({ queryKey: ["initialcomments", postid] });
     },
   });
 

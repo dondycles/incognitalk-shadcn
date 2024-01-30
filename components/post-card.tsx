@@ -63,13 +63,25 @@ export default function PostCard({
     refetchOnWindowFocus: false,
   });
 
+  const { data: initialComments, isLoading: initialCommentsLoading } = useQuery(
+    {
+      queryKey: ["initialcomments", postData?.id],
+      queryFn: async () => {
+        const { success } = await getcomments(postData.id as string, 1, false);
+        return success;
+      },
+      refetchOnWindowFocus: false,
+    }
+  );
+
   const { data: commentsData, isLoading: commentsLoading } = useInfiniteQuery({
     queryKey: ["comment", postData?.id],
     queryFn: async ({ pageParam }) => {
+      console.log("hi");
       const { success } = await getcomments(
         postData.id as string,
         pageParam,
-        isView
+        true
       );
       return success;
     },
@@ -250,21 +262,43 @@ export default function PostCard({
                   )}
                   <ScrollArea>
                     <div className="flex flex-col w-full gap-2 max-h-[300px]">
-                      {commentsLoading ? (
-                        <p className="text-muted-foreground text-xs">
-                          loading comments...
-                        </p>
-                      ) : showComments ? (
-                        comments?.map((comment: any[any]) => {
-                          return (
-                            <CommentCard
-                              userData={userData}
-                              key={comment.id}
-                              comment={comment}
-                            />
-                          );
-                        })
-                      ) : null}
+                      {isView ? (
+                        <>
+                          {commentsLoading ? (
+                            <p className="text-muted-foreground text-xs">
+                              loading comments...
+                            </p>
+                          ) : showComments ? (
+                            comments?.map((comment: any[any]) => {
+                              return (
+                                <CommentCard
+                                  userData={userData}
+                                  key={comment.id}
+                                  comment={comment}
+                                />
+                              );
+                            })
+                          ) : null}
+                        </>
+                      ) : (
+                        <>
+                          {initialCommentsLoading ? (
+                            <p className="text-muted-foreground text-xs">
+                              loading comments...
+                            </p>
+                          ) : showComments ? (
+                            initialComments?.map((comment: any[any]) => {
+                              return (
+                                <CommentCard
+                                  userData={userData}
+                                  key={comment.id}
+                                  comment={comment}
+                                />
+                              );
+                            })
+                          ) : null}
+                        </>
+                      )}
                     </div>
                   </ScrollArea>
 
