@@ -7,9 +7,11 @@ export default function FeedLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="w-full h-[100dvh] flex flex-col">
+    <main className="w-full h-[100dvh] flex flex-col ">
       <FeedNav />
-      <ScrollArea>{children}</ScrollArea>
+      <ScrollArea className="max-h-full h-full w-full relative">
+        {children}
+      </ScrollArea>
     </main>
   );
 }

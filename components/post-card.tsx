@@ -1,4 +1,11 @@
-import { Globe, Lock, Pencil, Trash, UserCircle } from "lucide-react";
+import {
+  ExternalLink,
+  Globe,
+  Lock,
+  Pencil,
+  Trash,
+  UserCircle,
+} from "lucide-react";
 import {
   FaRegComment,
   FaRegHeart,
@@ -22,17 +29,17 @@ import { getcomments } from "@/actions/get-comments";
 import { useOptimisticComent } from "@/store";
 import CommentCard from "./comment-card";
 import { Skeleton } from "./ui/skeleton";
-import { HiDotsVertical } from "react-icons/hi";
+import { HiDotsVertical, HiExternalLink } from "react-icons/hi";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { like } from "@/actions/like";
-import { getpost } from "@/actions/get-post";
 import { getlikes } from "@/actions/get-likes";
 import { unlike } from "@/actions/unlike";
 import { deletepost } from "@/actions/delete-post";
 import ViewPostCard from "./view-post-card";
 import { getcommentcount } from "@/actions/get-comment-count";
 import { ScrollArea } from "./ui/scroll-area";
+import Link from "next/link";
 
 interface PostCard extends React.HTMLProps<HTMLDivElement> {
   userData?: any[any];
@@ -158,7 +165,9 @@ export default function PostCard({
     <Card
       className={`${
         (isOptimistic && "opacity-50") || (deletePending && "opacity-50")
-      } ${isView && "border-0 shadow-none p-0"} modified-card `}
+      } ${
+        isView && "border-0 shadow-none p-0  w-full h-full  flex flex-col"
+      } modified-card`}
     >
       {isOptimistic && (
         <>
@@ -195,32 +204,39 @@ export default function PostCard({
                   )}
                 </div>
               </div>
-              {postData.author === userData?.id && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="ml-auto mr-0">
-                    <HiDotsVertical />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <Pencil className="w-4 h-4 mr-2" /> Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        _delete(postData.id);
-                      }}
-                    >
-                      <Trash className="w-4 h-4 mr-2" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
+              <div className="w-fit flex items-center ml-auto mr-0 gap-1">
+                {isView && (
+                  <Link href={"/post/" + postData.id}>
+                    <HiExternalLink className="w-4 h-4" />
+                  </Link>
+                )}
+                {postData.author === userData?.id && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="ml-0 mr-0">
+                      <HiDotsVertical />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>
+                        <Pencil className="w-4 h-4 mr-2" /> Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          _delete(postData.id);
+                        }}
+                      >
+                        <Trash className="w-4 h-4 mr-2" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
             </div>
           </CardHeader>
           <CardContent className="whitespace-pre">
             {postData.content}
           </CardContent>
-          <CardFooter className={`gap-4 flex-col`}>
+          <CardFooter className={`gap-4 flex-col self-stretch flex-1`}>
             <div className="grid grid-cols-3 gap-4 w-full">
               <Button
                 disabled={delayedLikePending}
@@ -229,7 +245,7 @@ export default function PostCard({
                 variant={isLiked ? "default" : "secondary"}
               >
                 <FaRegHeart />
-                {likesData.length ? (
+                {likesData?.length ? (
                   <p className="ml-1">{likesData.length}</p>
                 ) : null}
               </Button>
@@ -251,7 +267,7 @@ export default function PostCard({
             </div>
             {showComments && (
               <>
-                <div className="flex flex-col w-full gap-2">
+                <div className="flex flex-col w-full gap-2 h-full">
                   {optimisticComment.data && (
                     <CommentCard
                       userData={userData}
@@ -260,8 +276,12 @@ export default function PostCard({
                       isOptimistic={true}
                     />
                   )}
-                  <ScrollArea>
-                    <div className="flex flex-col w-full gap-2 max-h-[300px]">
+                  <ScrollArea className="h-full">
+                    <div
+                      className={`flex flex-col w-full gap-2 ${
+                        isView ? "max-h-[300px]" : "max-h-[300px]"
+                      }`}
+                    >
                       {isView ? (
                         <>
                           {commentsLoading ? (

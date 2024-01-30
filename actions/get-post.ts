@@ -24,7 +24,7 @@ export const getpost = async (id: string) => {
 
   const { data, error } = await supabase
     .from("posts")
-    .select("*, users(*), likes(*)")
+    .select("*, users(*), likes(*), comments(*)")
     .order("created_at", { ascending: false })
     .eq("id", id)
     .single();

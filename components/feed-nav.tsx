@@ -36,7 +36,7 @@ export default function FeedNav() {
   const userData = data?.success;
 
   return (
-    <nav className="system-padding w-full flex items-center justify-between border-b-border border-b-solid border-b-[1px]">
+    <nav className="system-padding w-full flex items-center justify-between border-b-border border-b-solid border-b-[1px] h-[74px]">
       <p className="font-bold text-lg sm:text-2xl">incognitalk.</p>
       <div className="flex items-center gap-4">
         <Dialog onOpenChange={setOpenDialog} open={openDialog}>
