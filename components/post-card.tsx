@@ -101,7 +101,7 @@ export default function PostCard({
   });
   const comments: any = commentsData?.pages.flatMap((page) => page);
 
-  const { data: likesData } = useQuery({
+  const { data: likesData, isLoading: likesDataLoading } = useQuery({
     initialData: postData?.likes,
     queryKey: ["likes", postData?.id],
     staleTime: 0,
@@ -240,7 +240,7 @@ export default function PostCard({
           <CardFooter className={`gap-4 flex-col self-stretch flex-1`}>
             <div className="grid grid-cols-3 gap-4 w-full">
               <Button
-                disabled={delayedLikePending}
+                disabled={delayedLikePending || likesDataLoading}
                 onClick={() => _like()}
                 size={"sm"}
                 variant={isLiked ? "default" : "secondary"}
@@ -251,6 +251,7 @@ export default function PostCard({
                 ) : null}
               </Button>
               <Button
+                disabled={initialCommentsLoading}
                 onClick={() => {
                   setToggleComments((prev) => !prev);
                 }}

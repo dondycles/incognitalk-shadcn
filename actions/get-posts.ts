@@ -26,7 +26,7 @@ export const getposts = async (page: number) => {
     .from("posts")
     .select("*, users(*), comments(*, users(*)), likes(*, users(*))")
     .order("created_at", { ascending: false })
-    .range(page === 1 ? 0 : page * 10, page === 1 ? 9 : page * 10 + 9);
+    .range(page === 1 ? 0 : page * 1, page === 1 ? 0 : page * 1 + 0);
 
   if (error) return { error: error };
 
