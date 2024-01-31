@@ -36,7 +36,7 @@ export default function ViewPostCard({
             </Link>
           </Button>
         </div>
-        <PostCard isView userData={userData} postData={postData} />
+        <PostCard isView={true} userData={userData} postData={postData} />
       </DialogContent>
     </Dialog>
   );

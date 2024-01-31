@@ -1,7 +1,12 @@
 import { Pencil, Trash, UserCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import { deletecomment } from "@/actions/delete-comment";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { HiDotsVertical } from "react-icons/hi";
 import {
   DropdownMenu,
@@ -9,16 +14,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EditCommentForm } from "./edit-comment-form";
 import { getSince } from "@/lib/getSince";
-import { AddCommentForm } from "./add-comment-form";
+import { AddUgCommentForm } from "./add-ugcomment-form";
+import UgCommentCard from "./ug-comment-card";
+import { useOptimisticUgComment } from "@/store";
+import { getugcomments } from "@/actions/get-ug-comments";
+import { useIntersection } from "@mantine/hooks";
 
 interface CommentCard extends React.HTMLProps<HTMLDivElement> {
   comment: any[any];
   userData: any[any];
   isOptimistic?: boolean;
   type?: string;
+  isView?: boolean;
 }
 
 export default function CommentCard({
@@ -26,15 +36,55 @@ export default function CommentCard({
   isOptimistic,
   userData,
   type,
+  isView,
   ...props
 }: CommentCard) {
   const queryClient = useQueryClient();
   const [isCommenting, setIsCommenting] = useState(false);
+
+  const { data: initialUgComments, isLoading: initialUgCommentsLoading } =
+    useQuery({
+      queryKey: ["initialugcomments", comment?.id],
+      queryFn: async () => {
+        const { success } = await getugcomments(
+          comment?.id as string,
+          1,
+          false
+        );
+        return success;
+      },
+      refetchOnWindowFocus: false,
+    });
+
+  const {
+    data: ugCommentsData,
+    isLoading: ugCommentsLoading,
+    fetchNextPage: fetchNextUgComments,
+    isFetchingNextPage: isFetchingNextUgComment,
+  } = useInfiniteQuery({
+    queryKey: ["ugcomment", comment?.id],
+    queryFn: async ({ pageParam }) => {
+      const { success } = await getugcomments(
+        comment?.id as string,
+        pageParam,
+        true
+      );
+      return success;
+    },
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    initialPageParam: 1,
+    getNextPageParam: (_, pages) => {
+      return pages.length + 1;
+    },
+  });
+  const ugcomments: any = ugCommentsData?.pages.flatMap((page) => page);
+
   const { mutate: delete_, isPending: deletePending } = useMutation({
     mutationFn: async () => deleteComment(),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["comment", comment.posts.id],
+        queryKey: ["initialcomments", comment.post],
       });
     },
   });
@@ -50,6 +100,19 @@ export default function CommentCard({
     const { success, error } = await deletecomment(comment.id);
     console.log(error);
   };
+
+  const optimisticUgComments = useOptimisticUgComment();
+
+  const lastComment = useRef<HTMLDivElement>(null);
+
+  const { ref: veryLastComment, entry } = useIntersection({
+    root: lastComment.current,
+    threshold: 1,
+  });
+
+  useEffect(() => {
+    if (entry?.isIntersecting) fetchNextUgComments();
+  }, [entry]);
 
   return (
     <div
@@ -105,9 +168,7 @@ export default function CommentCard({
             <p className="whitespace-pre">{comment.content}</p>
           )}
         </div>
-        {isCommenting && (
-          <AddCommentForm commentid={comment.id} postid={comment.post} />
-        )}
+
         <div className="text-sm flex flex-row gap-1">
           <p>{getSince(comment.created_at)}</p>
           <Button
@@ -128,6 +189,44 @@ export default function CommentCard({
             Comment
           </Button>
         </div>
+        {isCommenting && (
+          <AddUgCommentForm commentid={comment.id} postid={comment.post} />
+        )}
+        {optimisticUgComments.data && (
+          <UgCommentCard
+            userData={userData}
+            key={optimisticUgComments.data}
+            comment={optimisticUgComments.data}
+            isOptimistic={true}
+          />
+        )}
+        {isView ? (
+          ugcomments?.length ? (
+            <div className="w-full space-y-1 border-l-border border-l-solid border-l-[1px] pl-2">
+              {ugcomments?.map((comment: any) => {
+                return (
+                  <UgCommentCard
+                    key={comment.id}
+                    userData={userData}
+                    comment={comment}
+                  />
+                );
+              })}
+            </div>
+          ) : null
+        ) : (
+          <div className="w-full space-y-1 border-l-border border-l-solid border-l-[1px] pl-2">
+            {initialUgComments?.map((comment: any) => {
+              return (
+                <UgCommentCard
+                  key={comment.id}
+                  userData={userData}
+                  comment={comment}
+                />
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

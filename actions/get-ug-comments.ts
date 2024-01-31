@@ -1,8 +1,8 @@
 "use server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
-export const getcomments = async (
-  post: any[any],
+export const getugcomments = async (
+  comment: any[any],
   page: number,
   isView?: boolean
 ) => {
@@ -29,10 +29,10 @@ export const getcomments = async (
   const min = isView ? 5 : 2;
 
   const { data, error } = await supabase
-    .from("comments")
-    .select("*, users(*), posts(*))")
+    .from("ug_comments")
+    .select("*, users(*)")
     .order("created_at", { ascending: false })
-    .eq("post", post)
+    .eq("comment", comment)
     .range(page === 1 ? 0 : page * min, page === 1 ? max : page * min + max);
   if (error) return { error: error };
 

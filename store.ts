@@ -28,3 +28,13 @@ export const useOptimisticComent = create<OptimisticComent>()((set) => ({
   data: null,
   setData: (data) => set((state) => ({ data: data })),
 }));
+
+type OptimisticUgComment = {
+  data: any[any] | null | undefined;
+  setData: (content: any[any] | null | undefined) => void;
+};
+
+export const useOptimisticUgComment = create<OptimisticUgComment>()((set) => ({
+  data: null,
+  setData: (data) => set((state) => ({ data: data })),
+}));

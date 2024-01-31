@@ -310,6 +310,7 @@ export default function PostCard({
                                     userData={userData}
                                     key={comment.id}
                                     comment={comment}
+                                    isView={isView}
                                   />
                                 );
                               })}

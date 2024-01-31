@@ -19,7 +19,7 @@ export const editcomment = async (values: any[any]) => {
   const { data, error } = await supabase
     .from("comments")
     .update({
-      comment: values.comment,
+      content: values.content,
     })
     .eq("id", values.id);
 

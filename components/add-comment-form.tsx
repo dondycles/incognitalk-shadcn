@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/form";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
 import { useOptimisticComent } from "@/store";
 import { comment } from "@/actions/comment";
 import { Button } from "./ui/button";
@@ -23,16 +22,9 @@ const formSchema = z.object({
     message: "A message cannot be empty.",
   }),
   postid: z.string(),
-  commentid: z.string(),
 });
 
-export function AddCommentForm({
-  postid,
-  commentid,
-}: {
-  postid: string;
-  commentid?: string;
-}) {
+export function AddCommentForm({ postid }: { postid: string }) {
   const optimisticComment = useOptimisticComent();
   const queryClient = useQueryClient();
   const {
@@ -53,7 +45,6 @@ export function AddCommentForm({
     defaultValues: {
       content: "",
       postid: postid,
-      commentid: commentid,
     },
   });
 
