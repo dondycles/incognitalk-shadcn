@@ -41,3 +41,9 @@ export default function ViewPostCard({
     </Dialog>
   );
 }
+
+// ((EXISTS ( SELECT 1
+//   FROM posts
+//  WHERE ((posts.id = comments.post) AND (posts.privacy = 'public'::text)))) OR (EXISTS ( SELECT 1
+//   FROM comments comments_1
+//  WHERE (comments_1.id = comments_1.comment))))

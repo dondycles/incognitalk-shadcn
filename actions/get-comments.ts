@@ -31,7 +31,7 @@ export const getcomments = async (
 
   const { data, error } = await supabase
     .from("comments")
-    .select("*, users(*), posts(*))")
+    .select("*, users(*), posts(*), comments(*))")
     .order("created_at", { ascending: false })
     .eq("post", post)
     .range(page === 1 ? 0 : page * min, page === 1 ? max : page * min + max);

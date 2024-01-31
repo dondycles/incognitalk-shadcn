@@ -18,12 +18,14 @@ interface CommentCard extends React.HTMLProps<HTMLDivElement> {
   comment: any[any];
   userData: any[any];
   isOptimistic?: boolean;
+  type?: string;
 }
 
 export default function CommentCard({
   comment,
   isOptimistic,
   userData,
+  type,
   ...props
 }: CommentCard) {
   const queryClient = useQueryClient();
@@ -103,8 +105,9 @@ export default function CommentCard({
             <p className="whitespace-pre">{comment.content}</p>
           )}
         </div>
-        {isCommenting && <AddCommentForm id={comment.id} />}
-
+        {isCommenting && (
+          <AddCommentForm commentid={comment.id} postid={comment.post} />
+        )}
         <div className="text-sm flex flex-row gap-1">
           <p>{getSince(comment.created_at)}</p>
           <Button

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/form";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useOptimisticComent } from "@/store";
 import { comment } from "@/actions/comment";
 import { Button } from "./ui/button";
@@ -21,10 +22,17 @@ const formSchema = z.object({
   content: z.string().min(1, {
     message: "A message cannot be empty.",
   }),
-  id: z.string(),
+  postid: z.string(),
+  commentid: z.string(),
 });
 
-export function AddCommentForm({ id }: { id: string }) {
+export function AddCommentForm({
+  postid,
+  commentid,
+}: {
+  postid: string;
+  commentid?: string;
+}) {
   const optimisticComment = useOptimisticComent();
   const queryClient = useQueryClient();
   const {
@@ -34,9 +42,9 @@ export function AddCommentForm({ id }: { id: string }) {
   } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => onSubmit(values),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comment", id] });
-      queryClient.invalidateQueries({ queryKey: ["commentcount", id] });
-      queryClient.invalidateQueries({ queryKey: ["initialcomments", id] });
+      queryClient.invalidateQueries({ queryKey: ["comment", postid] });
+      queryClient.invalidateQueries({ queryKey: ["commentcount", postid] });
+      queryClient.invalidateQueries({ queryKey: ["initialcomments", postid] });
     },
   });
 
@@ -44,7 +52,8 @@ export function AddCommentForm({ id }: { id: string }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       content: "",
-      id: id,
+      postid: postid,
+      commentid: commentid,
     },
   });
 

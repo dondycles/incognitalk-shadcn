@@ -361,7 +361,7 @@ export default function PostCard({
                     </Button>
                   )}
                 </div>
-                <AddCommentForm id={postData.id} />
+                <AddCommentForm postid={postData.id} />
               </>
             )}
           </CardFooter>
