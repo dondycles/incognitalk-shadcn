@@ -7,6 +7,7 @@ import {
   Trash,
   UserCircle,
 } from "lucide-react";
+import { IoReturnUpBack } from "react-icons/io5";
 import {
   FaRegComment,
   FaRegHeart,
@@ -223,11 +224,6 @@ export default function PostCard({
                 </div>
               </div>
               <div className="w-fit flex items-center ml-auto mr-0 gap-1">
-                {isView && (
-                  <Link href={"/post/" + postData.id}>
-                    <HiExternalLink className="w-4 h-4" />
-                  </Link>
-                )}
                 {postData.author === userData?.id && (
                   <DropdownMenu>
                     <DropdownMenuTrigger className="ml-0 mr-0">
