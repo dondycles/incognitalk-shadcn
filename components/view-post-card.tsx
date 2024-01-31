@@ -31,7 +31,7 @@ export default function ViewPostCard({
             <IoReturnUpBack className="text-lg" />
           </Button>
           <Button asChild size={"icon"} variant={"outline"}>
-            <Link href={"/post/" + postData.id}>
+            <Link href={"/post/" + postData?.id}>
               <ExternalLink className="w-4 h-4" />
             </Link>
           </Button>

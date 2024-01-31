@@ -12,20 +12,19 @@ import {
 } from "@/components/ui/form";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
 import { useOptimisticComent } from "@/store";
 import { comment } from "@/actions/comment";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 
 const formSchema = z.object({
-  comment: z.string().min(1, {
+  content: z.string().min(1, {
     message: "A message cannot be empty.",
   }),
-  postid: z.string(),
+  id: z.string(),
 });
 
-export function AddCommentForm({ postid }: { postid: string }) {
+export function AddCommentForm({ id }: { id: string }) {
   const optimisticComment = useOptimisticComent();
   const queryClient = useQueryClient();
   const {
@@ -35,17 +34,17 @@ export function AddCommentForm({ postid }: { postid: string }) {
   } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => onSubmit(values),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comment", postid] });
-      queryClient.invalidateQueries({ queryKey: ["commentcount", postid] });
-      queryClient.invalidateQueries({ queryKey: ["initialcomments", postid] });
+      queryClient.invalidateQueries({ queryKey: ["comment", id] });
+      queryClient.invalidateQueries({ queryKey: ["commentcount", id] });
+      queryClient.invalidateQueries({ queryKey: ["initialcomments", id] });
     },
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      comment: "",
-      postid: postid,
+      content: "",
+      id: id,
     },
   });
 
@@ -53,7 +52,7 @@ export function AddCommentForm({ postid }: { postid: string }) {
     optimisticComment.setData(variables);
 
     const { error, success } = await comment(values);
-    if (error) return form.setError("comment", { message: error.message });
+    if (error) return form.setError("content", { message: error.message });
     optimisticComment.setData(null);
 
     form.reset();
@@ -69,7 +68,7 @@ export function AddCommentForm({ postid }: { postid: string }) {
       >
         <FormField
           control={form.control}
-          name="comment"
+          name="content"
           render={({ field }) => (
             <FormItem className="flex-1">
               <FormControl>
@@ -83,7 +82,7 @@ export function AddCommentForm({ postid }: { postid: string }) {
             </FormItem>
           )}
         />
-        {form.getValues("comment") && (
+        {form.getValues("content") && (
           <Button type="submit" disabled={isPending}>
             {isPending ? "Sending..." : "Comment"}
           </Button>

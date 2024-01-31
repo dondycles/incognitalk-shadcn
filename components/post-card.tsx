@@ -43,6 +43,7 @@ import { getcommentcount } from "@/actions/get-comment-count";
 import { ScrollArea } from "./ui/scroll-area";
 import Link from "next/link";
 import { useIntersection } from "@mantine/hooks";
+import { getSince } from "@/lib/getSince";
 
 interface PostCard extends React.HTMLProps<HTMLDivElement> {
   userData?: any[any];
@@ -212,9 +213,7 @@ export default function PostCard({
               <div className="flex flex-col">
                 <p className="font-semibold">{postData.users?.username}</p>
                 <div className="flex flex-row gap-1 items-center text-muted-foreground">
-                  <p className="text-xs">
-                    {new Date(postData.created_at).toLocaleDateString()}
-                  </p>
+                  <p className="text-xs">{getSince(postData.created_at)}</p>
                   {postData.privacy === "public" && (
                     <Globe className="w-3 h-3 " />
                   )}
@@ -362,7 +361,7 @@ export default function PostCard({
                     </Button>
                   )}
                 </div>
-                <AddCommentForm postid={postData.id} />
+                <AddCommentForm id={postData.id} />
               </>
             )}
           </CardFooter>

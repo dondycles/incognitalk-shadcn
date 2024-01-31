@@ -9,7 +9,7 @@ export default function ViewPost({ params }: { params: { id: string } }) {
       const { success } = await getpost(params.id);
       return success;
     },
-    queryKey: ["post", params.id],
+    queryKey: ["post ", params.id],
   });
 
   return (
