@@ -23,6 +23,7 @@ import { AddPostForm } from "./add-post-form";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getuser } from "@/actions/get-user";
+import Link from "next/link";
 
 export default function FeedNav() {
   const [openDialog, setOpenDialog] = useState(false);
@@ -37,7 +38,9 @@ export default function FeedNav() {
 
   return (
     <nav className="system-padding w-full flex items-center justify-between border-b-border border-b-solid border-b-[1px] h-[74px]">
-      <p className="font-bold text-lg sm:text-2xl">incognitalk.</p>
+      <Link href={"/"} className="font-bold text-lg sm:text-2xl">
+        incognitalk.
+      </Link>
       <div className="flex items-center gap-4">
         <Dialog onOpenChange={setOpenDialog} open={openDialog}>
           <DropdownMenu>

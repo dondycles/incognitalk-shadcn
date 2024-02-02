@@ -50,7 +50,6 @@ interface PostCard extends React.HTMLProps<HTMLDivElement> {
   isOptimistic?: boolean;
   optimisticContent?: any[any];
   postData?: any[any];
-  isView?: boolean;
 }
 
 export default function PostCard({
@@ -58,7 +57,6 @@ export default function PostCard({
   isOptimistic,
   optimisticContent,
   postData,
-  isView,
 }: PostCard) {
   const queryClient = useQueryClient();
   const optimisticComment = useOptimisticComent();
@@ -185,9 +183,7 @@ export default function PostCard({
     <Card
       className={`${
         (isOptimistic && "opacity-50") || (deletePending && "opacity-50")
-      } ${
-        isView && "border-0 shadow-none p-0  w-full h-full  flex flex-col"
-      } modified-card`}
+      }  modified-card`}
     >
       {isOptimistic && (
         <>
@@ -291,74 +287,28 @@ export default function PostCard({
                     />
                   )}
                   <ScrollArea className="h-full">
-                    <div
-                      className={`flex flex-col w-full gap-2 ${
-                        isView ? "max-h-[300px]" : "max-h-[300px]"
-                      }`}
-                    >
-                      {isView ? (
-                        <>
-                          {commentsLoading ? (
-                            <p className="text-muted-foreground text-xs">
-                              loading comments...
-                            </p>
-                          ) : showComments ? (
-                            <>
-                              {comments?.map((comment: any[any]) => {
-                                return (
-                                  <CommentCard
-                                    userData={userData}
-                                    key={comment.id}
-                                    comment={comment}
-                                    isView={isView}
-                                  />
-                                );
-                              })}
-
-                              <div
-                                ref={veryLastComment}
-                                className="pointer-events-none h-0 w-0 m-0 p-0 opacity-0"
-                              >
-                                HI
-                              </div>
-                              {isFetchingNextComment && (
-                                <div className="text-xs text-muted-foreground flex items-center gap-2 justify-center">
-                                  <p>loading more...</p>
-                                  <LucideLoader2 className=" animate-spin" />
-                                </div>
-                              )}
-                            </>
-                          ) : null}
-                        </>
-                      ) : (
-                        <>
-                          {initialCommentsLoading ? (
-                            <p className="text-muted-foreground text-xs">
-                              loading comments...
-                            </p>
-                          ) : showComments ? (
-                            initialComments?.map((comment: any[any]) => {
-                              return (
-                                <CommentCard
-                                  userData={userData}
-                                  key={comment.id}
-                                  comment={comment}
-                                />
-                              );
-                            })
-                          ) : null}
-                        </>
-                      )}
+                    <div className={`flex flex-col w-full gap-2`}>
+                      {initialCommentsLoading ? (
+                        <p className="text-muted-foreground text-xs">
+                          loading comments...
+                        </p>
+                      ) : showComments ? (
+                        initialComments?.map((comment: any[any]) => {
+                          return (
+                            <CommentCard
+                              userData={userData}
+                              key={comment.id}
+                              comment={comment}
+                            />
+                          );
+                        })
+                      ) : null}
                     </div>
                   </ScrollArea>
 
-                  {!isView && (commentCount?.length as number) > 2 && (
-                    <Button
-                      onClick={() => setViewPost(true)}
-                      size={"sm"}
-                      variant={"ghost"}
-                    >
-                      View More
+                  {(commentCount?.length as number) > 2 && (
+                    <Button asChild size={"sm"} variant={"ghost"}>
+                      <Link href={"/post/" + postData.id}>View More</Link>
                     </Button>
                   )}
                 </div>
@@ -382,14 +332,6 @@ export default function PostCard({
             <Skeleton className="w-full h-8" />
           </CardContent>
         </>
-      )}
-      {!isView && (
-        <ViewPostCard
-          postData={postData}
-          userData={userData}
-          open={viewPost}
-          onOpenChange={() => setViewPost((prev) => !prev)}
-        />
       )}
     </Card>
   );
