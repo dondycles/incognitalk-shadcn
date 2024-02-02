@@ -41,10 +41,9 @@ export function AddUgCommentForm({
   } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => onSubmit(values),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comment", postid] });
-      queryClient.invalidateQueries({ queryKey: ["commentcount", postid] });
+      queryClient.invalidateQueries({ queryKey: ["ugcomment", commentid] });
       queryClient.invalidateQueries({
-        queryKey: ["initialcomments", postid],
+        queryKey: ["initialugcomments", commentid],
       });
     },
   });
